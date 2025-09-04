@@ -26,7 +26,7 @@ with col2:
         if patient_id == "dsaintprofessor" and password == "fighting123@":
             st.session_state["is_logged_in"]= True
             st.session_state["patient_id"] = patient_id
-            st.switch_page("pages/Dashboard(save).py")
+            st.switch_page("pages/Dashboard.py")
         elif not (patient_id and password):
             st.error("모든 항목을 입력해주세요.")
         else:

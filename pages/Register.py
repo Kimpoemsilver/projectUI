@@ -96,7 +96,7 @@ with col2:
         st.session_state["is_logged_in"] = True
         st.session_state["patient_id"] = patient_id
         st.session_state["name"] = name
-        st.switch_page("pages/Dashboard(save).py")
+        st.switch_page("pages/Dashboard.py")
 
 
     left_col2_2, right_col2_2= st.columns([5,2])

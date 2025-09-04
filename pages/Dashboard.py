@@ -340,4 +340,4 @@ with left:
             with logout_button:
                 if st.button("로그아웃", use_container_width=True):
                     st.session_state.clear()
-                    st.switch_page("D:\\neproject25\\projectUI\\Login.py")
+                    st.switch_page("Login.py")
