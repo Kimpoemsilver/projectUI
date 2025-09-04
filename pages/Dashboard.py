@@ -60,7 +60,7 @@ with right:
                 else:
                     if "진료 등록하지 않았을 경우":
                         st.warning("먼저 진료 등록을 해주세요!")
-                    elif not is_diary_time(now):
+                    elif is_diary_time(now):
                         st.switch_page("pages/Patient_diary.py")
                     else:
                         st.success("하루 점검은 오후 6시부터 가능합니다.")
