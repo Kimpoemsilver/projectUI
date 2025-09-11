@@ -4,7 +4,9 @@ st.title("🧾 환자 상세 정보")
 
 if "selected_patient" not in st.session_state:
     st.warning("환자를 선택하지 않았습니다. 메인 화면으로 돌아가세요.")
-    st.page_link("main_home.py", label="🏠 메인으로 돌아가기")
+    st.button("돌아가기")
+    if st.button:
+        st.switch_page("pages\Patient_intake1.py")
 else:
     patient = st.session_state["selected_patient"]
 
@@ -25,5 +27,5 @@ else:
     st.write(f"- ALT: {patient['ALT']} IU/L")
 
     # 돌아가기 버튼
-    if st.button("⬅ 메인으로 돌아가기"):
-        st.switch_page("main_home.py")
+    if st.button("닫기"):
+        st.switch_page("pages\Patient_intake1.py")
