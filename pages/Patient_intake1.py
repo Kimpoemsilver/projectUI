@@ -32,4 +32,4 @@ if st.button("새 진료 등록하기"):
 back_btn = st.button("돌아가기") 
 if back_btn:                       
     st.session_state["is_logged_in"] = True
-    st.switch_page("Dashboard.py")
+    st.switch_page("pages/Dashboard.py")
