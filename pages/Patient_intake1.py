@@ -26,3 +26,7 @@ else:
 
 if st.button("새 진료 등록하기"):
     st.switch_page("pages/Patient_intake2.py")
+
+st.button("돌아가기")
+if st.button:
+    st.switch_page("pages/Dashboard.py")
