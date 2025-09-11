@@ -49,7 +49,9 @@ alt = st.text_input("ALT (IU/L)")
 # ---------------------------------------------
 # 프로필 저장 버튼
 # ---------------------------------------------
-saved = False  
+if "saved" not in st.session_state:
+    st.session_state["saved"] = False
+
 if st.button("프로필 저장"):
 
     required_fields = [name, age, sex, height, weight, glucose, egfr, ast, alt]
@@ -88,9 +90,10 @@ if st.button("프로필 저장"):
     save_patient(profile)
 
     st.success(f"{name} 환자 프로필이 저장되었습니다.")
-    saved = True
+    st.session_state["saved"] = True
 
-if saved:
-    if st.button("닫기"):   
+if st.session_state["saved"]:
+    if st.button("닫기"):
+        st.session_state["saved"] = False  
         st.switch_page("pages/Patient_intake1.py")
     
