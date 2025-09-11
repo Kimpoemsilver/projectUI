@@ -30,7 +30,7 @@ if st.button("새 진료 등록하기"):
     st.switch_page("pages/Patient_intake2.py")
 
 if st.session_state.get("saved", False):  
-    st.button("돌아가기")
-    if st.button:
+    back_btn = st.button("돌아가기")   
+    if back_btn:                       
         st.session_state["is_logged_in"] = True
-        st.switch_page(BACK_PAGE_PATH)
+        st.switch_page("Dashboard.py")
