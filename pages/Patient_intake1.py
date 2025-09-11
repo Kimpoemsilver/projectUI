@@ -31,4 +31,5 @@ if st.button("새 진료 등록하기"):
 
 st.button("돌아가기")
 if st.button:
+    st.session_state["is_logged_in"] = True
     st.switch_page(BACK_PAGE_PATH)
