@@ -1,220 +1,262 @@
-import json
-from datetime import date, datetime
-import sqlite3
 import streamlit as st
-from pathlib import Path
+from datetime import datetime
 
 
-demo_mode = True  
-DB_PATH = Path("app.db") # 여긴 또 DB 연결
+st.set_page_config(page_title="하루점검", page_icon="💊", layout="wide")
 
-def get_conn():
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute("PRAGMA foreign_keys = ON;")
-    return conn
+DEMO_DAY_NUM_DOSE = int(st.session_state.get("Prescribed_num_dose", 3))
 
-def now_local():
-    return datetime.now()
-
-def within_diary_window(ts: datetime) -> bool:
-    return (ts.hour >= 18) or (ts.hour < 2)
-
-# ????? 미정
-def demo_store():
-    return st.session_state.demo_store
-
-def is_registered() -> bool:
-    if demo_mode:
-        return bool(demo_store()["registered"])
-    else:
-        with get_conn() as con:
-            cur = con.execute("SELECT registered FROM patient WHERE patient_id=1;")
-            row = cur.fetchone()
-            return bool(row[0]) if row else False
-
-def get_per_day_doses() -> int | None:
-    if demo_mode:
-        return demo_store()["prescription"]["per_day_doses"]
-    else:
-        with get_conn() as con:
-            cur = con.execute("SELECT per_day_doses FROM doctor_prescription WHERE patient_id=1 ORDER BY start_date DESC LIMIT 1;")
-            row = cur.fetchone()
-            return int(row[0]) if row else None
-
-def save_daily(record_date: str, doses_taken: int, side_effects: list[str], severities: dict, emotion_text: str, phq9_score: float|None):
-    if demo_mode:
-        demo_store()["daily"][record_date] = {
-            "doses_taken": doses_taken,
-            "side_effects": side_effects,
-            "severities": severities,
-            "emotion_text": emotion_text,
-            "phq9_score": phq9_score,
-        }
-    else:
-        with get_conn() as con:
-            con.execute("""
-            INSERT OR REPLACE INTO daily_check(patient_id,record_date,doses_taken,side_effects,severities,emotion_text,phq9_score)
-            VALUES(1,?,?,?,?,?,?);
-            """, (record_date, doses_taken, json.dumps(side_effects), json.dumps(severities), emotion_text, phq9_score))
-            con.commit()
+BACK_PAGE_PATH = "pages/Dashboard.py"
 
 SIDE_EFFECTS = [
-    ("Dry mouth", "입마름"),
-    ("Drowsiness", "졸림"),
-    ("Insomnia", "불면"),
-    ("Blurred vision", "시야 흐림"),
-    ("Headache", "두통"),
-    ("Constipation", "변비"),
-    ("Diarrhoea", "설사"),
-    ("Increased appetite", "식욕 증가"),
-    ("Decreased appetite", "식욕 저하"),
-    ("Nausea or vomiting", "구역감/구토"),
-    ("Problems with urination", "배뇨 문제"),
-    ("Problems with sexual function", "성기능 문제"),
-    ("Palpitations", "가슴 두근거림"),
-    ("Feeling light-headed on standing", "기립 시 어지러움"),
-    ("Feeling like the room is spinning", "빙글빙글 도는 느낌"),
-    ("Sweating", "발한"),
-    ("Increased body temperature", "체온 상승"),
-    ("Tremor", "떨림"),
-    ("Disorientation", "지남력 장애"),
-    ("Yawning", "하품"),
-    ("Weight gain", "체중 증가"),
+    ("입마름", "입안이 바싹 마르고 침이 잘 안 나와 물을 자주 마셔야 하는 느낌이 드나요?"),
+    ("졸림", "낮에도 자꾸 눈이 감기고 깨어 있기 힘들 정도로 졸리신가요?"),
+    ("불면", "밤에 잠이 잘 안 오거나 자주 깨서 숙면을 못 하고 있나요?"),
+    ("시야 흐림", "글씨나 사물이 뿌옇게 보여서 초점 맞추기가 어렵나요?"),
+    ("두통", "머리가 무겁거나 지끈거리는 통증이 자주 생기나요?"),
+    ("변비", "변이 잘 안 나오거나 딱딱해서 힘들게 배변하시나요?"),
+    ("설사", "변이 묽고 하루에도 여러 번 화장실을 가시나요?"),
+    ("식욕 증가", "평소보다 배가 자주 고프고 음식을 많이 찾게 되시나요?"),
+    ("식욕 저하", "밥맛이 없고 음식을 잘 못 드시나요?"),
+    ("구역감/구토", "속이 울렁거리거나 토한 적이 있으신가요?"),
+    ("배뇨 문제", "소변이 잘 안 나오거나, 자주 마려운 느낌이 있으신가요?"),
+    ("성기능 문제", "성욕이 줄거나 성관계 시 어려움이 있으신가요?"),
+    ("가슴 두근거림", "특별한 이유 없이 심장이 빨리 뛰거나 두근거림을 느끼시나요?"),
+    ("기립 시 어지러움", "앉았다 일어나거나 갑자기 설 때 어지럽고 눈앞이 하얘지나요?"),
+    ("빙글빙글 도는 느낌", "주변이 돌거나 몸이 휘청거리는 어지럼증이 있으신가요?"),
+    ("발한", "특별히 덥지 않은데도 땀이 많이 나시나요?"),
+    ("체온 상승", "열이 나거나 몸이 평소보다 뜨겁게 느껴지나요?"),
+    ("떨림", "손이나 몸이 저절로 떨리거나 미세하게 흔들리나요?"),
+    ("지남력 장애", "지금이 언제인지, 여기가 어딘지 헷갈린 적이 있나요?"),
+    ("하품", "특별히 피곤하지 않아도 하품이 자주 나오나요?"),
+    ("체중 증가", "식습관 변화가 없는데도 체중이 늘고 있나요?"),
 ]
+                              
 
-st.set_page_config(page_title="하루점검", page_icon="📝", layout="centered")
+# side_effect as se
+# patient_daily as pd
+if "pd_step" not in st.session_state:
+    st.session_state.pd_step = 1
+    st.session_state.side_eff_selected = []         # pd 2단계에서 선택한 부작용들
+    st.session_state.side_eff_severity = {}         # pd 3단계 점수 {라벨: 1|2|3}
+    st.session_state.day_num_dose = None     # pd 1단계: 오늘 복용한 횟수
+    st.session_state.emotion_text = ""             # pd 4단계: 자유 기록
+    st.session_state.pd_saved = False         # pd 4단계: 저장 성공 여부
 
+name = st.session_state.get("name", "김행근")
 
-if not is_registered(): # -> 대시보드에서 구현할까 고민중
-    st.warning("먼저 진료 등록을 해주세요.")
-    st.page_link("../dashboard.py", label="대시보드로 돌아가기", icon="↩️")
-    st.stop()
+st.markdown(
+    """
+    <style>
+    /* 전체 기본 글자 크게 */
+    .stApp { font-size: 18px; }
 
-if "diary_step" not in st.session_state:
-    st.session_state.diary_step = 1
-if "diary_data" not in st.session_state:
-    st.session_state.diary_data = {
-        "record_date": date.today().isoformat(),
-        "doses_taken": 0,
-        "effects": [],
-        "severities": {},  
-        "emotion": "",
+    /* 헤더(제일 크게) */
+    .sticky-header { position: sticky; top: 0; z-index: 9; }
+    .header-badge {
+        display:inline-block;
+        padding: 10px 16px;
+        border-radius: 18px;
+        border: 2px solid #7e9dc5;
+        background:#f7f7fb;
+        font-weight: 800;
+        font-size: 2rem;   /* ← 헤더 가장 큼 */
+        line-height: 1.2;
     }
-saved_flag_key = "diary_saved_flag"
-if saved_flag_key not in st.session_state:
-    st.session_state[saved_flag_key] = False
 
-per_day = get_per_day_doses() or 0
+    /* 안내문/질문/선택박스 폰트 */
+    .intro-text { font-size: 1.25rem; font-weight: 600; margin: 6px 0 18px; }
+    .question-label { font-size: 1.4rem; font-weight: 700; margin-bottom: 10px; display:block; }
+    div[data-baseweb="select"] { font-size: 1.2rem !important; }  /* select 안 글자 */
 
-st.markdown(f"### {demo_store()['patient']['name'] if demo_mode else '환자'}님 하루점검")
+    /* /회 표시 글자 & 간격 미세조정 */
+    .right-note { text-align:left; color:#777; font-size: 1.1rem; margin-left: -8px; }
+
+    /* 버튼 글자 */
+    .stButton > button { font-size: 1.1rem; padding: 0.4rem 1rem; }
+
+    /* 체크박스(다음 단계에서 쓰일 수 있음) */
+    div.stCheckbox > label > div:first-child {
+        border-radius: 50% !important;
+        width: 1.2em; height: 1.2em; border: 2px solid #888;
+    }
+    div.stCheckbox > label div[data-testid="stTickIcon"] svg { display: none; }
+    div[role="checkbox"][aria-checked="true"] + div {
+        background: #4aa5ad !important; border-color:#4aa5ad !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 
-if st.session_state.diary_step == 1:
-    st.caption("다음의 질문에 답변해주세요.")
-    st.write("오늘 하루 동안 약을 얼마나 복용했나요?")
-    if per_day <= 0:
-        st.error("의사 처방의 1일 복용 개수가 등록되어 있지 않습니다. (진료 등록에서 설정)")
-    opts = list(range(0, (per_day or 0) + 1))
-    st.session_state.diary_data["doses_taken"] = st.selectbox("복용 횟수", options=opts, index=0, key="dose_select")
-    st.write(f" / {per_day}회")
+def diary_header():
+    st.markdown(
+        f"""
+        <div class="sticky-header">
+          <span class="header-badge">{name}님 하루점검</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    # <div> ... </div>: 박스(블록) 단위로 나눌 때 사용
+    # -> 이 ...안에 들어간 내용 전체를 하나의 구역으로 묶음.
+    # 마지막에 </div>는 여기서 div 블록이 끝났다는 표시. 
+    # <div> 안에 있는 class=...는 이 블록의 스타일을 적용해주는 것.
+    # -> 블록에 sticky-header 스타일을 적용하겠다는 뜻.
+    # <span> ... </spam>: 텍스트 같은 짧은 부분에 스타일을 적용할 때 사용. 
+    # -> 여기서는 {name}님 하루점검이란느 글씨에만 header-badge 스타일을 적용하겠다는 뜻.
+    # </span>은 여기까지가 span 영역이라는 표시.
 
-    if st.button("다음", type="primary"):
-        st.session_state.diary_step = 2
-        st.experimental_rerun()
 
+def pd_step_1():
+    diary_header()
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<span class="question-label">오늘 하루 동안 약을 얼마나 복용했나요?</span>', 
+                unsafe_allow_html=True)
 
-elif st.session_state.diary_step == 2:
-    st.write("오늘, 약물 때문에 겪었다고 느끼는 증상이 있다면 체크해주세요.")
-    # 보기 배치(행 단위 컬럼)
-    chosen = []
-    cols_per_row = 4
-    rows = [SIDE_EFFECTS[i:i+cols_per_row] for i in range(0, len(SIDE_EFFECTS), cols_per_row)]
-    for row in rows:
-        cols = st.columns(len(row))
-        for (en, ko), c in zip(row, cols):
-            with c:
-                if st.checkbox(f"{ko}", help="부작용 설명(조사 필요)", key=f"ef_{en}"):
-                    chosen.append(en)  # 내부 키는 영어로 저장
+    col_1, col_2 = st.columns([6,4])
+    with col_1:
+    # col[0]: 첫 번째 열, col[1]: 두 번째 열, col[2]: 세 번째 열 ... ing
+        cols = st.columns([10,1,3])
+        st.markdown("<br>", unsafe_allow_html=True)
+        with cols[0]:
+            options = list(range(0, DEMO_DAY_NUM_DOSE + 1))
+            day_num_dose_selected = st.selectbox(
+                "",
+                options,
+                index=None,
+                placeholder="선택",
+                key="day_num_dose",
+                label_visibility="collapsed")
 
-    st.session_state.diary_data["effects"] = chosen
+        with cols[1]:
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown(f"<p class='right-note'>/{DEMO_DAY_NUM_DOSE}회</p>", unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("뒤로"):
-            st.session_state.diary_step = 1
-            st.experimental_rerun()
-    with col2:
-        if st.button("다음", type="primary"):
-            if len(chosen) == 0:
-                # 아무것도 없으면 4단계로 스킵
-                st.session_state.diary_step = 4
+        st.markdown("<br>", unsafe_allow_html=True)
+        # <br>: 줄바꿈의 의미,여백을 억지로 버리고 싶을 때 넣음.
+        if st.button("다음", key="btn_next_step1", use_container_width=False):
+            if day_num_dose_selected is None: 
+                st.error("복용 횟수를 선택해주세요.")
             else:
-                st.session_state.diary_step = 3
-            st.experimental_rerun()
+                st.session_state.pd_step = 2
+                st.rerun()
+            # st.rerun() = 코드를 즉시 다시 실행해서, 
+            # 바뀐 session_state 값이 화면에 바로 반영되도록 함.
 
 
-elif st.session_state.diary_step == 3:
-    st.write("선택한 증상의 정도를 선택해주세요 (1=약하게, 3=강하게).")
-    effects = st.session_state.diary_data["effects"]
-    severities = {}
-    for en in effects:
-        # 라벨은 한국어 표시
-        ko = next((ko for (e, ko) in SIDE_EFFECTS if e == en), en)
-        st.markdown(f"**{ko}**")
-        val = st.radio(
-            label=f"{ko} 강도",
-            options=[1,2,3],
-            index=0,
+def pd_step_2():
+    diary_header()
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<span class="question-label">오늘, 약물 때문에 겪었다고 느끼는 증상이 아래에 있다면 체크해주세요.</span>', 
+                unsafe_allow_html=True)
+
+    num_cols = 5
+    cols = st.columns(num_cols)
+    for i, (label, tip) in enumerate(SIDE_EFFECTS):
+        with cols[i % num_cols]:
+            st.checkbox(label, key=f"se_{label}", help=tip)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    prev, spacer1, spacer1, next = st.columns([1,4,4,1])
+    with prev:
+        if st.button("이전", key="btn_prev_step2", use_container_width=False):
+            st.session_state.pd_step = 1
+            st.rerun()
+
+    with next:
+        if st.button("다음", key="btn_next_step2", use_container_width=False):
+            selected = [label for (label, tip) in SIDE_EFFECTS if st.session_state.get(f"se_{label}", False)
+                        ]
+            st.session_state.side_eff_selected = selected
+            st.session_state.pd_step = 3 if selected else 4
+            st.rerun()
+
+
+def pd_step_3():
+    selected = st.session_state.get("side_eff_selected", [])
+    if not selected:
+        st.session_state.pd_step = 4
+        st.rerun()
+
+    diary_header()
+    st.markdown('<span class="question-label">다음 증상이 느껴지는 정도에 대해 1(약하게 느껴짐)~3(강하게 느껴짐) 점까지 체크해주세요.</span>', 
+                unsafe_allow_html=True)
+
+    side_eff_severity = st.session_state.setdefault("side_eff_severity", {})
+    for label in selected:
+        side_eff_severity[label] = st.radio(
+            label,
+            [1, 2, 3],
             horizontal=True,
-            key=f"sev_{en}"
+            index=None,
+            key=f"sev_{label}",
         )
-        severities[en] = int(val)
-    st.session_state.diary_data["severities"] = severities
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("뒤로"):
-            st.session_state.diary_step = 2
-            st.experimental_rerun()
-    with col2:
-        if st.button("다음", type="primary"):
-            st.session_state.diary_step = 4
-            st.experimental_rerun()
+    st.markdown("<br>", unsafe_allow_html=True)
+    prev, spacer1, spacer2, next = st.columns([1,4,4,1])
+    with prev:
+        if st.button("이전", key="btn_prev_step3", use_container_width=False):
+            st.session_state.pd_step = 2
+            st.rerun()
+    with next:
+            if st.button("다음", key="btn_next_step3", use_container_width=False):
+                missing = [label for label in selected if side_eff_severity.get(label) is None]
+                if missing: 
+                    st.error("모든 항목에 응답해주세요.")
+                else:
+                    st.session_state.pd_step = 4
+                    st.rerun()
 
-elif st.session_state.diary_step == 4:
-    st.write("**오늘 하루의 기분 또는 느낌을 자유롭게 표현해주세요.**")
-    st.session_state.diary_data["emotion"] = st.text_area(
-        "감정 기록",
+
+def pd_step_4():
+    diary_header()
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<span class="question-label">오늘 하루의 기분 또는 느낌을 자유롭게 표현해주세요.</span>', 
+                unsafe_allow_html=True)
+    
+    st.session_state.emotion_text = st.text_area(
+        "",
+        value=st.session_state.get("emotion_text", ""),
+        height=260,
         placeholder="텍스트를 입력해주세요.",
-        height=180
+        key="pd_text_area",
     )
 
-    
-    if st.button("저장", type="primary"):
-        d = st.session_state.diary_data
-        phq9_score = None
-        if demo_mode:
-            phq9_score = max(0, min(27, int(len(d["emotion"]) / 20)))
+    save_col, msg_col, spacer, close_col = st.columns([1, 2, 6, 1])
+    with save_col:
+        if st.button("이전", key="btn_prev_step4", use_container_width=False):
+            st.session_state.pd_step = 3
+            st.rerun()
+        save_clicked = st.button("저장", key="btn_save_step4")
 
-        save_daily(
-            record_date=d["record_date"],
-            doses_taken=int(d["doses_taken"]),
-            side_effects=d["effects"],
-            severities=d["severities"],
-            emotion_text=d["emotion"],
-            phq9_score=phq9_score
-        )
-        st.success("저장되었습니다.")
-        st.session_state[saved_flag_key] = True
+    with msg_col:
+        if save_clicked:
+            text_val = st.session_state.get("emotion_text", "").strip()
+            if not text_val:
+                st.error("메세지를 입력하세요.")
+                st.session_state.pd_saved = False
+            else:
+                st.success("저장되었습니다.")
+                st.session_state.pd_saved = True
+
+    with close_col:
+        if st.button("닫기", key="btn_close_step4", 
+                     disabled=not st.session_state.pd_saved):
+                st.switch_page(BACK_PAGE_PATH)
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
-    if st.session_state[saved_flag_key]:
-        st.page_link("../dashboard.py", label="닫기(대시보드로 이동)", icon="✅")
+step = int(st.session_state.pd_step)
+if step == 1:
+    pd_step_1()
+elif step == 2:
+    pd_step_2()
+elif step == 3:
+    pd_step_3()
+else:
+    pd_step_4()
 
-
-    if st.button("뒤로"):
-        if st.session_state.diary_data["effects"]:
-            st.session_state.diary_step = 3
-        else:
-            st.session_state.diary_step = 2
-        st.experimental_rerun()
