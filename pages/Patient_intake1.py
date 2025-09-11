@@ -22,7 +22,7 @@ if patients:
             st.session_state["selected_patient"] = p  # 클릭한 환자 저장
             st.switch_page("pages/Patient_detail.py")  # 상세 페이지로 이동
 else:
-    st.info("저장된 환자 기록이 없습니다.")
+    st.info("저장된 진료 기록이 없습니다.")
 
-if st.button("새 환자 등록하기"):
-    st.switch_page("pages/patient_intake2.py")
+if st.button("새 진료 등록하기"):
+    st.switch_page("pages/Patient_intake2.py")
