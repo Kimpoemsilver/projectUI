@@ -182,6 +182,7 @@ def pd_step_3():
         st.rerun()
 
     diary_header()
+    st.markdown("<br>", unsafe_allow_html=True)
     st.markdown('<span class="question-label">다음 증상이 느껴지는 정도에 대해 1(약하게 느껴짐)~3(강하게 느껴짐) 점까지 체크해주세요.</span>', 
                 unsafe_allow_html=True)
 
