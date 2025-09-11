@@ -89,4 +89,4 @@ if st.button("프로필 저장"):
     st.success(f"{name} 환자 프로필이 저장되었습니다.")
     st.button("닫기")
     if st.button:
-        st.switch_page("pages\Patient_intake1.py")  # 저장 후 메인으로 이동
+        st.switch_page("pages/Patient_intake1.py")  # 저장 후 메인으로 이동
