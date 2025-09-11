@@ -28,4 +28,4 @@ else:
 
     # 돌아가기 버튼
     if st.button("닫기"):
-        st.switch_page("pages\Patient_intake1.py")
+        st.switch_page("pages/Patient_intake1.py")
