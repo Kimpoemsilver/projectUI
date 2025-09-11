@@ -6,7 +6,7 @@ if "selected_patient" not in st.session_state:
     st.warning("환자를 선택하지 않았습니다. 메인 화면으로 돌아가세요.")
     st.button("돌아가기")
     if st.button:
-        st.switch_page("pages\Patient_intake1.py")
+        st.switch_page("pages/Patient_intake1.py")
 else:
     patient = st.session_state["selected_patient"]
 
