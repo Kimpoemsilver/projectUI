@@ -4,6 +4,8 @@ import os
 
 DATA_FILE = "patients.json"
 
+BACK_PAGE_PATH = "pages/Dashboard.py"
+
 def load_patients():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
@@ -29,4 +31,4 @@ if st.button("새 진료 등록하기"):
 
 st.button("돌아가기")
 if st.button:
-    st.switch_page("pages/Dashboard.py")
+    st.switch_page(BACK_PAGE_PATH)
