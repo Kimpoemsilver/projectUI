@@ -49,6 +49,7 @@ alt = st.text_input("ALT (IU/L)")
 # ---------------------------------------------
 # 프로필 저장 버튼
 # ---------------------------------------------
+saved = False  
 if st.button("프로필 저장"):
 
     required_fields = [name, age, sex, height, weight, glucose, egfr, ast, alt]
