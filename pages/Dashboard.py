@@ -98,6 +98,27 @@ MESSAGES = [
     "당신의 오늘이 어제보다 나아지길 바라요🌈"
 ]
 
+def with_tooltip(title: str, tip: str) -> str:
+                return f"""
+                <div style="display:inline-flex; align-items:center; font-size:1.4rem; font-weight:600;">
+                    {title}
+                    <span style="
+                        display:inline-block; 
+                        margin-left:8px; 
+                        width:22px; 
+                        height:22px; 
+                        border-radius:50%; 
+                        background:#e5e7eb; 
+                        color:#374151; 
+                        font-size:1rem; 
+                        font-weight:bold;
+                        text-align:center; 
+                        line-height:22px; 
+                        cursor:default;" 
+                        title="{tip}">?
+                    </span>
+                </div>
+                """
 
 today_str = date.today().isoformat()
 
@@ -196,7 +217,9 @@ with left:
     with calendar_left:
         st.markdown(" ")
         st.markdown(" ")
-        st.subheader("칭찬 기록")
+        st.markdown(with_tooltip("칭찬 기록", 
+                                 "약을 얼마나 잘 복용하고 있는지, 한 달 간의 복용 기록을 확인할 수 있어요. \n처방받은 약을 전부 복용했을 경우 : 너무 훌륭해! 스티커 \n 처방받은 약을 2/3 이상 복용했을 경우 : 넌 할 수 있어! 스티커 \n처방받은 약을 2/3 미만으로 복용했을 경우 : 좀 더 열심히~ 스티커"), 
+                                 unsafe_allow_html=True)
 
         today = date.today()
         st.markdown(f"### {today.year}년 {today.month}월")
@@ -280,26 +303,9 @@ with left:
         st.markdown(table_html, unsafe_allow_html=True)
 
         with right:
-            st.markdown("""
-<div style="display:flex; align-items:center; font-size:1.25rem; font-weight:600;">
-    오늘의 메세지
-    <span style="
-        display:inline-block; 
-        margin-left:6px; 
-        width:18px; 
-        height:18px; 
-        border-radius:50%; 
-        background:#e5e7eb; 
-        color:#374151; 
-        font-size:0.85rem; 
-        font-weight:bold;
-        text-align:center; 
-        line-height:18px; 
-        cursor:help;" 
-        title="매일 랜덤으로 표시되는 응원 메세지입니다. 하루 동안 유지돼요.">?
-    </span>
-</div>
-""", unsafe_allow_html=True)
+            st.markdown(with_tooltip("오늘의 메세지",
+                                      "매일 랜덤 메세지를 띄워줍니다. 하루동안 유지되어 당신의 하루를 응원해요."), 
+                                      unsafe_allow_html=True)
             st.write(f"> {msg}")
             # 중간에 들어간 > = Markdown 문법, 인용구를 만들 때 주로 사용.
             # -> 깔끔한 박스 스타일로 한 줄 메세지를 보여줄 수 있음.
@@ -308,7 +314,7 @@ with left:
             st.markdown(" ")
             st.markdown(" ")
             st.markdown(" ")
-            st.subheader("마음 기록")
+            st.markdown(with_tooltip("마음 기록", "하루점검에서 작성한 하루 기록 텍스트를 phq9 기반 감정 점수로 변환하여 그래프로 나타내줘요. 우울감의 정도와 감정 변화를 확인할 수 있어요."), unsafe_allow_html=True)
             dummy_phq = pd.DataFrame({
                 "today_str": ["2025-09-01", "2025-09-02", "2025-09-03", "2025-09-04", "2025-09-05"],
                 "phq_score": [18, 20, 24, 25, 19]
