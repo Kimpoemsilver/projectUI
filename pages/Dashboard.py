@@ -218,7 +218,7 @@ with left:
         st.markdown(" ")
         st.markdown(" ")
         st.markdown(with_tooltip("칭찬 기록", 
-                                 "약을 얼마나 잘 복용하고 있는지, 한 달 간의 복용 기록을 확인할 수 있어요. \n처방받은 약을 전부 복용했을 경우 : 너무 훌륭해! 스티커 \n 처방받은 약을 2/3 이상 복용했을 경우 : 넌 할 수 있어! 스티커 \n처방받은 약을 2/3 미만으로 복용했을 경우 : 좀 더 열심히~ 스티커"), 
+                                 "약을 얼마나 잘 복용하고 있는지, 한 달 간의 복용 기록을 확인할 수 있어요. <br> 처방받은 약을 전부 복용했을 경우 : 너무 훌륭해! 스티커 \n처방받은 약을 2/3 이상 복용했을 경우 : 넌 할 수 있어! 스티커 \n처방받은 약을 2/3 미만으로 복용했을 경우 : 좀 더 열심히~ 스티커"), 
                                  unsafe_allow_html=True)
 
         today = date.today()
@@ -304,7 +304,7 @@ with left:
 
         with right:
             st.markdown(with_tooltip("오늘의 메세지",
-                                      "매일 랜덤 메세지를 띄워줍니다. 하루동안 유지되어 당신의 하루를 응원해요."), 
+                                      "매일 랜덤 메세지를 띄워줍니다. \n하루동안 유지되어 당신의 하루를 응원해요."), 
                                       unsafe_allow_html=True)
             st.write(f"> {msg}")
             # 중간에 들어간 > = Markdown 문법, 인용구를 만들 때 주로 사용.
@@ -314,7 +314,7 @@ with left:
             st.markdown(" ")
             st.markdown(" ")
             st.markdown(" ")
-            st.markdown(with_tooltip("마음 기록", "하루점검에서 작성한 하루 기록 텍스트를 phq9 기반 감정 점수로 변환하여 그래프로 나타내줘요. 우울감의 정도와 감정 변화를 확인할 수 있어요."), unsafe_allow_html=True)
+            st.markdown(with_tooltip("마음 기록", "하루점검에서 작성한 하루 기록 텍스트를 phq9 기반 감정 점수로 변환하여 그래프로 나타내줘요. \n우울감의 정도와 감정 변화를 확인할 수 있어요."), unsafe_allow_html=True)
             dummy_phq = pd.DataFrame({
                 "today_str": ["2025-09-01", "2025-09-02", "2025-09-03", "2025-09-04", "2025-09-05"],
                 "phq_score": [18, 20, 24, 25, 19]
