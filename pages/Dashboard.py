@@ -280,7 +280,26 @@ with left:
         st.markdown(table_html, unsafe_allow_html=True)
 
         with right:
-            st.subheader("오늘의 메세지")
+            st.markdown("""
+<div style="display:flex; align-items:center; font-size:1.25rem; font-weight:600;">
+    오늘의 메세지
+    <span style="
+        display:inline-block; 
+        margin-left:6px; 
+        width:18px; 
+        height:18px; 
+        border-radius:50%; 
+        background:#e5e7eb; 
+        color:#374151; 
+        font-size:0.85rem; 
+        font-weight:bold;
+        text-align:center; 
+        line-height:18px; 
+        cursor:help;" 
+        title="매일 랜덤으로 표시되는 응원 메세지입니다. 하루 동안 유지돼요.">?
+    </span>
+</div>
+""", unsafe_allow_html=True)
             st.write(f"> {msg}")
             # 중간에 들어간 > = Markdown 문법, 인용구를 만들 때 주로 사용.
             # -> 깔끔한 박스 스타일로 한 줄 메세지를 보여줄 수 있음.
