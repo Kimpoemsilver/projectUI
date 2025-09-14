@@ -29,7 +29,7 @@ st.markdown("## 프로필 등록")
 patients = load_patients()
 edit_mode = st.session_state.get("edit_mode", False)
 
-patient = st.session_state.get("selected_patient", {})
+patient = st.session_state.get("selected_patient", patients[-1] if patients else {})
 
 name = st.session_state.get("name", patient.get("이름", ""))
 st.text_input("이름", value=name, disabled=True)
