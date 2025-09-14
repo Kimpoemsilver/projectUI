@@ -37,14 +37,12 @@ else:
     # [-1] = 리스트의 마지막 요소.
     # [-2] = 뒤에서 두 번째 요소
 
-left, right = st.columns([6, 2])
-with left:
-    st.subheader(f"👤 {profile['이름']} 님의 프로필")
-with right:
-    if st.button("수정"):
-        st.session_state["edit_mode"] = True
-        st.session_state["selected_patient"] = profile
-        st.switch_page("pages/Patient_intake2.py")
+    left, right = st.columns([6, 2])
+    with right:
+        if st.button("수정"):
+            st.session_state["edit_mode"] = True
+            st.session_state["selected_patient"] = profile
+            st.switch_page("pages/Patient_intake2.py")
 
     # 기본 정보
     col1, col2 = st.columns(2)
