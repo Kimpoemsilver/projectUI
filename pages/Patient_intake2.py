@@ -25,10 +25,8 @@ def save_patients(patients):
 
 
 st.markdown("## 프로필 등록")
-
-patients = load_patients()
 edit_mode = st.session_state.get("edit_mode", False)
-
+patients = load_patients()
 patient = st.session_state.get("selected_patient", patients[-1] if patients else {})
 
 name = st.session_state.get("name", patient.get("이름", ""))
@@ -57,7 +55,8 @@ with col4:
 
 
 st.write("### 검사 수치 입력")
-glucose = st.text_input("공복혈당 (mg/dL)", value=str(patients.get("공복혈당", "")))
+
+glucose = st.text_input("공복혈당 (mg/dL)", value=str(patient.get("공복혈당", "")))
 egfr = st.text_input("eGFR (mL/min/1.73㎡)", value=str(patient.get("eGFR", "")))
 ast = st.text_input("AST (IU/L)", value=str(patient.get("AST", "")))
 alt = st.text_input("ALT (IU/L)", value=str(patient.get("ALT", "")))
