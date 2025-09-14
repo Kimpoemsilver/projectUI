@@ -37,30 +37,30 @@ else:
     # [-1] = 리스트의 마지막 요소.
     # [-2] = 뒤에서 두 번째 요소
 
-    left, right = st.columns([6,3])
-    with left:
-        st.subheader(f"👤 {profile['이름']} 님의 프로필")
+if "selected_patient" not in st.session_state:
+    st.warning("환자를 선택하지 않았습니다. 메인 화면으로 돌아가세요.")
+    st.button("돌아가기")
+    if st.button:
+        st.switch_page("pages/Patient_intake1.py")
+    else:
+        patient = st.session_state["selected_patient"]
 
-    with right:
-        if st.button("수정"):
-            st.session_state["edit_mode"] = True
-            st.session_state["selected_patient"] = profile
-            st.switch_page("pages/Patient_intake2.py")
+        st.subheader(f"👤 {patient['이름']} 님의 프로필")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write(f"**나이**: {profile['나이']}")
-        st.write(f"**성별**: {profile['성별']}")
-    with col2:
-        st.write(f"**키**: {profile['키']} cm")
-        st.write(f"**몸무게**: {profile['몸무게']} kg")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(f"**나이**: {patient['나이']}")
+            st.write(f"**성별**: {patient['성별']}")
+        with col2:
+            st.write(f"**키**: {patient['키']} cm")
+            st.write(f"**몸무게**: {patient['몸무게']} kg")
 
-    st.markdown("### 검사 수치")
-    st.write(f"- 공복혈당: {profile['공복혈당']} mg/dL")
-    st.write(f"- eGFR: {profile['eGFR']} mL/min/1.73㎡")
-    st.write(f"- AST: {profile['AST']} IU/L")
-    st.write(f"- ALT: {profile['ALT']} IU/L")
-
+        st.markdown("### 🧪 검사 수치")
+        st.write(f"- 공복혈당: {patient['공복혈당']} mg/dL")
+        st.write(f"- eGFR: {patient['eGFR']} mL/min/1.73㎡")
+        st.write(f"- AST: {patient['AST']} IU/L")
+        st.write(f"- ALT: {patient['ALT']} IU/L")
+        
 if st.button("돌아가기"):
     st.session_state["is_logged_in"] = True
     st.switch_page("pages/Dashboard.py")
