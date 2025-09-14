@@ -26,6 +26,7 @@ patients = load_patients()
 if not patients:
     st.info("프로필을 입력해주세요.")
     if st.button("프로필 등록하기"):
+        st.session_state["edit_mode"] = False
         st.switch_page("pages/Patient_intake2.py")
 else:
     profile = patients[-1]
@@ -35,6 +36,16 @@ else:
     # patients[1] = 리스트에 저장된 두 번째 환자.
     # [-1] = 리스트의 마지막 요소.
     # [-2] = 뒤에서 두 번째 요소
+
+    left, right = st.columns([6,3])
+    with left:
+        st.subheader(f"👤 {profile['이름']} 님의 프로필")
+
+    with right:
+        if st.button("수정"):
+            st.session_state["edit_mode"] = True
+            st.session_state["selected_patient"] = profile
+            st.switch_page("pages/Patient_intake2.py")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -49,11 +60,6 @@ else:
     st.write(f"- eGFR: {profile['eGFR']} mL/min/1.73㎡")
     st.write(f"- AST: {profile['AST']} IU/L")
     st.write(f"- ALT: {profile['ALT']} IU/L")
-
-if st.button("수정"):
-    st.session_state["edit_mode"] = True
-    st.session_state["selected_patient"] = profile
-    st.switch_page("pages/Patient_intake2.py")
 
 if st.button("돌아가기"):
     st.session_state["is_logged_in"] = True

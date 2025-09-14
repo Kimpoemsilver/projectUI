@@ -10,7 +10,7 @@ def load_patients():
             return json.load(f)
     return []
 
-def save_patient(patients):
+def save_patients(patients):
     # 파일 없으면 초기화
     if not os.path.exists(DATA_FILE):
         with open(DATA_FILE, "w", encoding="utf-8") as f:
@@ -65,52 +65,27 @@ alt = st.text_input("ALT (IU/L)", value=str(patient.get("ALT", "")))
 # ---------------------------------------------
 # 프로필 저장 버튼
 # ---------------------------------------------
-if "saved" not in st.session_state:
-    st.session_state["saved"] = False
-
 if st.button("프로필 저장"):
-    required_fields = [name, age, sex, height, weight, glucose, egfr, ast, alt]
-    if any(str(value).strip() == "" for value in required_fields):
-        st.error("모든 항목을 입력해주세요.")
-        st.stop()
-
-    try:
-        glucose_val = float(glucose)
-        egfr_val = float(egfr)
-        ast_val = float(ast)
-        alt_val = float(alt)
-    except ValueError:
-        st.error("검사 수치는 숫자로 입력해주세요.")
-        st.stop()
-
-
     profile = {
         "이름": name,
         "나이": age,
         "성별": sex,
         "키": height,
         "몸무게": weight,
-        "공복혈당": glucose_val,
-        "eGFR": egfr_val,
-        "AST": ast_val,
-        "ALT": alt_val
+        "공복혈당": float(glucose),
+        "eGFR": float(egfr),
+        "AST": float(ast),
+        "ALT": float(alt)
     }
 
-    # session_state에도 기록
-    edit_mode = st.session_state.get("edit_mode", False)
-    save_patient(profile, edit_mode)
-    if "records" not in st.session_state:
-        st.session_state["records"] = []
-    st.session_state["records"].append(profile)
+    if edit_mode and patients:
+        patients[-1] = profile  # 마지막 환자 덮어쓰기
+    else:
+        patients.append(profile)  # 새 프로필 등록
 
-    # JSON 파일에도 기록
-    save_patient(profile)
+    save_patients(patients)
 
-    st.success(f"{name} 환자 프로필이 저장되었습니다.")
-    st.session_state["saved"] = True
+    st.session_state["selected_patient"] = profile
     st.session_state["edit_mode"] = False
-
-if st.session_state["saved"]:
-    if st.button("닫기"):
-        st.session_state["saved"] = False  
-        st.switch_page("pages/Patient_intake1.py")
+    st.success(f"{name} 환자 프로필이 저장되었습니다.")
+    st.switch_page("pages/Patient_intake1.py")
