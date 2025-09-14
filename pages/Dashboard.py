@@ -50,7 +50,7 @@ with right:
     with right_col2:
         button_1, button_2 = st.columns([1,1])
         with button_1:
-            if st.button("진료등록", use_container_width=True):
+            if st.button("프로필 등록", use_container_width=True):
                 st.switch_page("pages/Patient_intake1.py")
 
         with button_2:
