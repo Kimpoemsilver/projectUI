@@ -3,7 +3,6 @@ import json
 import os
 
 DATA_FILE = "patients.json"
-
 BACK_PAGE_PATH = "pages/Dashboard.py"
 
 def load_patients():
@@ -36,10 +35,24 @@ else:
     # patients[1] = 리스트에 저장된 두 번째 환자.
     # [-1] = 리스트의 마지막 요소.
     # [-2] = 뒤에서 두 번째 요소
-    st.json(profile)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write(f"**나이**: {profile['나이']}")
+        st.write(f"**성별**: {profile['성별']}")
+    with col2:
+        st.write(f"**키**: {profile['키']} cm")
+        st.write(f"**몸무게**: {profile['몸무게']} kg")
+
+    st.markdown("### 검사 수치")
+    st.write(f"- 공복혈당: {profile['공복혈당']} mg/dL")
+    st.write(f"- eGFR: {profile['eGFR']} mL/min/1.73㎡")
+    st.write(f"- AST: {profile['AST']} IU/L")
+    st.write(f"- ALT: {profile['ALT']} IU/L")
 
 if st.button("수정"):
-    st.session_state["deit_mode"] = True
+    st.session_state["edit_mode"] = True
+    st.session_state["selected_patient"] = profile
     st.switch_page("pages/Patient_intake2.py")
 
 if st.button("돌아가기"):
