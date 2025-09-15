@@ -12,7 +12,6 @@ def load_patients():
 
 def save_patients(patients):
     # 파일 없으면 초기화
-    if not os.path.exists(DATA_FILE):
         with open(DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(patients, f, ensure_ascii=False, indent=2)
             # json.dump(obj, fp, ...) = 파이썬 객체를 josn 형식으로 변환해서 파일에 저장. 
