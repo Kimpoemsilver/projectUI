@@ -20,7 +20,7 @@ if not st.session_state.get("is_logged_in", False):
     st.stop()
 
 if demo_mode:
-    patient_id = st.session_state["patient_id"]
+    patient_id = st.session_state.get["patient_id", None]
     st.session_state.setdefault("name", "김행근")
     name = st.session_state["name"]
 
