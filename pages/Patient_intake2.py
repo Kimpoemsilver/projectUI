@@ -88,7 +88,6 @@ if st.button("프로필 저장"):
     st.success(f"{name} 환자 프로필이 저장되었습니다.")
     st.session_state["saved"] = True
     st.session_state["edit_mode"] = False
-    st.switch_page("pages/Patient_intake1.py")
 
     if st.session_state["saved"]:
         if st.button("닫기"):
